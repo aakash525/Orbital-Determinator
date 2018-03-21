@@ -1,65 +1,88 @@
+'''
+Source: Algorithm 5.1 on Gibb's Method in book "Orbital Mechanics for Engineering Student"
+
+graphics.py is taken from https://github.com/Elucidation/OrbitalElements
+
+Important:
+In order to get the plot you have to first install Tkinter.
+Type the following command into your terminal.
+
+$ sudo apt-get install python-tk
+'''
+
+import urllib2
 import graphics
 import numpy as np
 
 sqrt = np.sqrt
 pi = np.pi
 
-# refer to algorithm 5.1 on Gibb's Methon in "Orbital Mechanics for Engineering Student"
-
+'''
+class for Gibb's implementation
+'''
 class Gibbs:
     'Implementing Gibb\'s Method to plot orbit of a satellite'
-    meu = 398600
+    meu = 398600.4418
 
-    # initializing class variables
-    def __init__(self, filename):
+    def __init__(self):
+        '''
+        Initializing class variables
+
+        Args:
+            self : class variables
+            filename : name of data file
+
+        Returns:
+            NIL
+        '''
+
         self.file_len = 0
-        self.filename = filename
         self.axis = 0.0
         self.inc = 0.0
         self.asc = 0.0
         self.ecc = 0.0
         self.per = 0.0
         self.anom = 0.0
-        self.count = 3
 
-    # finding total number of lines
-    def length_file(self):
-        self.file_len = 0
-        with open(self.filename,'r') as f:
-            for line in f:
-                self.file_len += 1
+    def read_file(self, d):
+        '''
+        Read the given position vector file
 
-    # read the given position vector file
-    def read_file(self):
-        with open(self.filename,'r') as f:
-            vec1 = next(f)
-            vec2 = next(f)
-            vec3 = next(f)
-            for i in range(0,self.file_len-3):     # self.file_len-3
-                self.gibbs(vec1, vec2, vec3)
+        Args:
+            self : class variables
 
-                vec1 = vec2
-                vec2 = vec3
-                vec3 = next(f)
-                self.count += 1
+        Returns:
+            NIL
+        '''
 
-        # vec1 = np.array([-2568078.88734,	6300006.06465,	40312.7696707])
-        # vec2 = np.array([-2563060.49572,	6302004.69549,	45733.8880385])
-        # vec3 = np.array([-2558038.85986,	6303995.34944,	51154.9485178])
-        self.gibbs(vec1, vec2, vec3)                                                # call gibb's method function
+        self.file_len = len(d)
+        for i in range(0,self.file_len-2):
+            vec1 = d[i]
+            vec2 = d[i+1]
+            vec3 = d[i+2]
+            self.gibbs(vec1, vec2, vec3)                # call gibb's method function
 
-        self.average()                                                              # taking average of all the orbital elements from file
-        self.display()                                                              # function to print orbital elements
-        self.plot_figure()                                                          # plot the figure of orbit
+        self.average()                                  # taking average of all the orbital elements from file
+        self.display()                                  # function to print orbital elements
+        self.plot_figure()                              # plot the figure of orbit
 
     def gibbs(self, data1, data2, data3):
+        '''
+        Gibb's Method
+
+        Args:
+            self : class variables
+            data1 : position vector 1
+            data2 : position vector 2
+            data3 : position vector 3
+
+        Returns:
+            NIL
+        '''
+
         v1 = data1.split()
         v2 = data2.split()
         v3 = data3.split()
-
-        # v1 = [float(data1[0])/1000, float(data1[1])/1000, float(data1[2])/1000]
-        # v2 = [float(data2[0])/1000, float(data2[1])/1000, float(data2[2])/1000]
-        # v3 = [float(data3[0])/1000, float(data3[1])/1000, float(data3[2])/1000]
 
         v1 = [float(v1[1])/1000, float(v1[2])/1000, float(v1[3])/1000]              # converting m to km
         v2 = [float(v2[1])/1000, float(v2[2])/1000, float(v2[3])/1000]
@@ -77,11 +100,6 @@ class Gibbs:
         c23_unit = [float(c23[0]/mag_c23), float(c23[1]/mag_c23), float(c23[2]/mag_c23)]
         u_unit = [float(v1[0]/mag_v1), float(v1[1]/mag_v1), float(v1[2]/mag_v1)]
         coplanar = float(c23_unit[0]*u_unit[0]) + float(c23_unit[1]*u_unit[1]) + float(c23_unit[2]*u_unit[2])
-
-        # if(coplanar < 0.1):
-        #     print "1. All the three vectors are coplanar"
-        # else:
-        #     print "1. Vectors are non-coplanar"
 
         N = [float(mag_v1*c23[0] + mag_v2*c31[0] + mag_v3*c12[0]),
              float(mag_v1*c23[1] + mag_v2*c31[1] + mag_v3*c12[1]),
@@ -104,23 +122,26 @@ class Gibbs:
         self.orbital_elements(v2, v)
 
     def orbital_elements(self, r, v):
+        '''
+        Finding orbital elements from the position and velocity vectors
+
+        Args:
+            self : class variables
+            r : position vector
+            v : velocity vector
+
+        Returns:
+            NIL
+        '''
+
         mag_r = sqrt(r[0]**2 + r[1]**2 + r[2]**2)
         mag_v = sqrt(v[0]**2 + v[1]**2 + v[2]**2)
         vr = (v[0]*r[0] + v[1]*r[1] + v[2]*r[2])/mag_r
-
-        # if(vr > 0):
-        #     print "2. Satellite is flying away perigee"
-        # else:
-        #     print "2 .Satellite is flying towards perigee"
 
         h = [r[1]*v[2] - v[1]*r[2], (-1)*(r[0]*v[2] - v[0]*r[2]), r[0]*v[1] - v[0]*r[1]]
         mag_h = sqrt(h[0]**2 + h[1]**2 + h[2]**2)
 
         inclination = np.arccos(h[2]/mag_h)*(180/pi)
-        # if(inclination > 90):
-        #     print "3 .The orbit is retrograde"
-        # else:
-        #     print "3. The orbit is not retrograde"
 
         N = [-h[1], -h[0], 0]
         mag_N = sqrt(N[0]**2 + N[1]**2 + N[2]**2)
@@ -159,14 +180,34 @@ class Gibbs:
         self.anom += true_anomaly
 
     def average(self):
-        self.axis /= self.count
-        self.inc /= self.count
-        self.asc /= self.count
-        self.ecc /= self.count
-        self.per /= self.count
-        self.anom /= self.count
+        '''
+        Average orbital elements to reduce noise
+
+        Args:
+            self : class variables
+
+        Returns:
+            NIL
+        '''
+
+        self.axis /= self.file_len
+        self.inc /= self.file_len
+        self.asc /= self.file_len
+        self.ecc /= self.file_len
+        self.per /= self.file_len
+        self.anom /= self.file_len
 
     def display(self):
+        '''
+        Displaying calculated orbital elements
+
+        Args:
+            self : class variables
+
+        Returns:
+            NIL
+        '''
+
         print "=== Orbital Elements ===\n"
         print "Semi-major Axis                                  : ", self.axis
         print "Inclination (degrees)                            : ", self.inc
@@ -176,12 +217,28 @@ class Gibbs:
         print "True Anomaly                                     : ", self.anom
 
     def plot_figure(self):
+        '''
+        Plotting the orbital elements
+
+        Args:
+            self : class variables
+
+        Returns:
+            NIL
+        '''
+
         graphics.plotOrbit(self.axis, self.ecc, self.inc, self.asc, self.per, self.anom)
         graphics.plotEarth()
         graphics.doDraw()
 
-filename = "gibbs_data1.csv"
-obj = Gibbs(filename)
-obj.length_file()
-# print "=== Summary ==="
-obj.read_file()
+'''
+link contains the dataset which has 4 columns as,
+Time , x , y , z
+'''
+link = "https://raw.githubusercontent.com/aakash525/Orbital-Determinator/master/gibbs_data1.csv"
+data = urllib2.urlopen(link)
+d = data.read()
+d = d.splitlines()
+
+obj = Gibbs()
+obj.read_file(d)

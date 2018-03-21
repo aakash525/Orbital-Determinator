@@ -1,13 +1,37 @@
+'''
+Calculating Orbital Elements (Keplerian elements) from Line 2 of TLE and
+plotting the figure.
+
+graphics.py is taken from https://github.com/Elucidation/OrbitalElements
+
+Important:
+In order to get the plot you have to first install Tkinter.
+Type the following command into your terminal.
+
+$ sudo apt-get install python-tk
+'''
+
 import urllib2
 import graphics
 import numpy as np
-
-# sudo apt-get install python-tk
 
 GM = 398600.4418
 pi = np.pi
 
 def eccentricity_anomaly(anomaly, eccentricity, init, iter=500, accuracy = 0.0001):
+    '''
+    Calculates true anomaly from the mean anomaly
+
+    Args:
+        anomaly : mean anomaly
+        eccentricity : eccentricity
+        init : initial anomaly
+        iter : maximum number of iterations (default 500)
+        accuracy : threshold (default 0.0001)
+
+    Returns:
+        true anomaly
+    '''
 
     for i in xrange(iter):
         true = init - (init - eccentricity * np.sin(init) - anomaly) / (1.0 - eccentricity * np.cos(init))
@@ -16,6 +40,17 @@ def eccentricity_anomaly(anomaly, eccentricity, init, iter=500, accuracy = 0.000
     return true
 
 def orbital_elements(name, data):
+    '''
+    Calcualtes orbital elements from line 2 of TLE and plots it
+
+    Args:
+        name : name of the satellite
+        data : line 2 of TLE for finding Keplerian elements
+
+    Returns:
+        NIL
+    '''
+
     line = list(data)
     inclination = float(''.join(line[8:16]))
     ascension = float(''.join(line[17:25]))
@@ -44,11 +79,23 @@ def orbital_elements(name, data):
 
     return ;
 
-data = urllib2.urlopen("http://www.celestrak.com/NORAD/elements/stations.txt")
+# Reading NORAD TLE data
+# link = "http://www.celestrak.com/NORAD/elements/stations.txt"
+link = "https://celestrak.com/NORAD/elements/cubesat.txt"
+data = urllib2.urlopen(link)
 d = data.read()
 d = d.splitlines()
 
-print d[0] + "\n" + d[1] + "\n" + d[2]
+# Test example
+# name = "NOAA 14"
+# line1 = "1 23455U 94089A   97320.90946019  .00000140  00000-0  10191-3 0  2621"
+# line2 = "2 23455  99.0090 272.6745 0008546 223.1686 136.8816 14.11711747148495"
+
+num = 1
+name = d[num*3 - 3]
+line1 = d[num*3 - 2]
+line2 = d[num*3 - 1]
+print name + "\n" + line1 + "\n" + line2
 print "\n----------------------------\n"
-print "Satellite_Name : " + d[0] + "\n"
-orbital_elements(d[0], d[2])
+print "Satellite_Name : " + name + "\n"
+orbital_elements(name, line2)
