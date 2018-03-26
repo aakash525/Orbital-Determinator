@@ -11,7 +11,7 @@ Type the following command into your terminal.
 $ sudo apt-get install python-tk
 '''
 
-import urllib2
+import urllib
 import graphics
 import numpy as np
 
@@ -80,16 +80,10 @@ def orbital_elements(name, data):
     return ;
 
 # Reading NORAD TLE data
-# link = "http://www.celestrak.com/NORAD/elements/stations.txt"
 link = "https://celestrak.com/NORAD/elements/cubesat.txt"
-data = urllib2.urlopen(link)
+data = urllib.urlopen(link)
 d = data.read()
 d = d.splitlines()
-
-# Test example
-# name = "NOAA 14"
-# line1 = "1 23455U 94089A   97320.90946019  .00000140  00000-0  10191-3 0  2621"
-# line2 = "2 23455  99.0090 272.6745 0008546 223.1686 136.8816 14.11711747148495"
 
 num = 1
 name = d[num*3 - 3]

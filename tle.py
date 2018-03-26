@@ -4,7 +4,7 @@ Input: Two line Elements
 Output: Satellite's information and it's orbital parameters
 '''
 
-import urllib2
+import urllib
 import numpy as np
 from datetime import datetime, timedelta
 
@@ -185,9 +185,8 @@ def line2(data):
 
 
 # Reading NORAD TLE data
-# link = "http://www.celestrak.com/NORAD/elements/stations.txt"
 link = "https://celestrak.com/NORAD/elements/cubesat.txt"
-data = urllib2.urlopen(link)
+data = urllib.urlopen(link)
 d = data.read()
 d = d.splitlines()
 
