@@ -15,3 +15,6 @@
 > Good Resource for implementing Gibb's Method:
   Algorithm 5.1 of book Orbital Mechanics for Engineering Students
   also look at Algorithm 4.1, this will help in finding orbital elements from the inputs of Algorithm 5.1
+  
+> Good Resrouce for Sphinx Documentation:
+  https://davidstutz.de/setting-up-sphinx-for-documenting-python-projects/
