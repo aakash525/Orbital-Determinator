@@ -115,5 +115,5 @@ def scrap_data(db):
     db.close()
 
 if __name__ == "__main__":
-    db,_ = create_database("d1")
+    db,_ = create_database("cubesat")
     scrap_data(db)
