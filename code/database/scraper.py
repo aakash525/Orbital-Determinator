@@ -27,7 +27,7 @@ def database_connect(name):
         d : connection flag (0: success)
     """
 
-    db = mc.connect(user='root', password='mysql', host='localhost')
+    db = mc.connect(user='xxxx', password='xxxxx', host='localhost')
     cursor = db.cursor()
     d = cursor.execute('use ' + name)
     # print('Database selected')
